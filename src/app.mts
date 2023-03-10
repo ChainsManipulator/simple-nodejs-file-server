@@ -1,23 +1,11 @@
 import * as http from "http";
 import { promises as fs, createReadStream, ReadStream } from "fs";
 import * as path from "path";
+import { MIME_TYPES } from "./mimeTypes.mjs";
 
 const ROOT_PATH: string = path.join(process.cwd(), "./wwwroot");
 const HOSTNAME: string = "127.0.0.1";
 const PORT: number = 3000;
-
-const MIME_TYPES = new Map();
-MIME_TYPES.set("html", "text/html");
-MIME_TYPES.set("css", "text/css");
-MIME_TYPES.set("js", "application/javascript");
-MIME_TYPES.set("png", "image/png");
-MIME_TYPES.set("jpg", "image/jpeg");
-MIME_TYPES.set("jpeg", "image/jpeg");
-MIME_TYPES.set("gif", "image/gif");
-MIME_TYPES.set("json", "application/json");
-MIME_TYPES.set("xml", "application/xml");
-MIME_TYPES.set("ico", "image/x-icon"); // should be "image/vnd.microsoft.icon" but nobody uses that
-MIME_TYPES.set("default", "application/octet-stream");
 
 const sendResponse = (res: http.ServerResponse, responseCode: number, data: string, extension: string = "html") => {
 	const mimeType: string = MIME_TYPES.get(extension);
