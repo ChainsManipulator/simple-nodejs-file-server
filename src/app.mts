@@ -19,9 +19,9 @@ MIME_TYPES.set("xml", "application/xml");
 MIME_TYPES.set("ico", "image/x-icon"); // should be "image/vnd.microsoft.icon" but nobody uses that
 MIME_TYPES.set("default", "application/octet-stream");
 
-const sendResponce = (res: http.ServerResponse, responceCode: number, data: string, extension: string = "html") => {
+const sendResponse = (res: http.ServerResponse, responseCode: number, data: string, extension: string = "html") => {
 	const mimeType: string = MIME_TYPES.get(extension);
-	res.writeHead(responceCode, { "Content-Type": mimeType });
+	res.writeHead(responseCode, { "Content-Type": mimeType });
 	res.end(data);
 }
 
@@ -30,10 +30,10 @@ const server = http.createServer(async (req, res) => {
 	const paths: string[] = [ROOT_PATH, url];
 
 	// if no filename provided using index.html by default
-	if (url.endsWith("/")) paths.push("index.html");
+	if (url.endsWith("/") && !url.includes(".")) paths.push("index.html");
 	
 	// getting file extension without leading dot
-	let extension: string = path.extname(url).substring(1).toLowerCase();
+	let extension: string = path.extname(paths[paths.length-1]).substring(1).toLowerCase();
 
 	// if there is no file extension then adding "html"
 	if (!extension) {
@@ -45,7 +45,7 @@ const server = http.createServer(async (req, res) => {
 
 	const pathUnderRoot: boolean = filePath.startsWith(ROOT_PATH);
 	if (!pathUnderRoot) {
-		sendResponce(res, 404, `404: Invalid path "${filePath}"`);
+		sendResponse(res, 404, `404: Invalid path "${filePath}"`);
 		return;
 	}
 
@@ -56,7 +56,7 @@ const server = http.createServer(async (req, res) => {
 	// alternatevly return 404 for unknown file extensions 
 	const supportedExtension: boolean = Boolean(mimeType);
 	if (!MIME_TYPES.has(extension)) {
-		sendResponce(res, 404, `404: Unsupported file type ${extension}`);
+		sendResponse(res, 404, `404: Unsupported file type ${extension}`);
 		return;
 	}*/
 
@@ -71,7 +71,7 @@ const server = http.createServer(async (req, res) => {
 
 		console.log(`Served file ${filePath} with ${mimeType} mime-type `);
 	} catch {
-		sendResponce(res, 404, `404: File "${filePath}" not found`);
+		sendResponse(res, 404, `404: File "${filePath}" not found`);
 	}
 });
 
