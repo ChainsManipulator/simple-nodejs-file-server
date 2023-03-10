@@ -37,11 +37,17 @@ const server = http.createServer(async (req, res) => {
 
 	// if there is no file extension then adding "html"
 	if (!extension) {
-		paths[-1] += ".html";
+		paths[paths.length-1] += ".html";
 		extension = "html";
 	}
 
 	let filePath: string = path.join(...paths);
+
+	const pathUnderRoot: boolean = filePath.startsWith(ROOT_PATH);
+	if (!pathUnderRoot) {
+		sendResponce(res, 404, `404: Invalid path "${filePath}"`);
+		return;
+	}
 
 	const mimeType: string = MIME_TYPES.has(extension) ?
 		MIME_TYPES.get(extension) :
@@ -53,12 +59,6 @@ const server = http.createServer(async (req, res) => {
 		sendResponce(res, 404, `404: Unsupported file type ${extension}`);
 		return;
 	}*/
-
-	const pathUnderRoot: boolean = filePath.startsWith(ROOT_PATH);
-	if (!pathUnderRoot) {
-		sendResponce(res, 404, `404: Invalid path "${filePath}"`);
-		return;
-	}
 
 	try {
 		// checking if file exists and readable
