@@ -37,7 +37,9 @@ const sendResponseFile = async (res: http.ServerResponse, filePath: string, mime
 
 const server = http.createServer(async (req, res) => {
 	// if request url is emty replacing it with default value
-	let url: string = req.url && req.url !== "/" ? req.url : "/index.html";
+	let url: string = req.url!;
+	if (!req.url || req.url === "/") url = "/index.html";
+
 	const fileName: string = path.basename(url);
 
 	// getting file extension without leading dot
@@ -57,14 +59,15 @@ const server = http.createServer(async (req, res) => {
 		extension = "html";
 	}
 
-	let mimeType: string;
-	if (MIME_TYPES.has(extension)) mimeType = MIME_TYPES.get(extension);
-	else {
-		if (REFUSE_UNKNOWN_EXTENSIONS) {
-			// return 404 for unknown file extensions 
-			sendResponse(res, 404, `404: Unsupported file type ${extension}`);
-			return;
-		} else mimeType = MIME_TYPES.get("default");
+	const isExtensionKnown: boolean = MIME_TYPES.has(extension);
+	const mimeType: string = isExtensionKnown ?
+		MIME_TYPES.get(extension) :
+		MIME_TYPES.get("default");
+
+	if (!isExtensionKnown && REFUSE_UNKNOWN_EXTENSIONS) {
+		// return 404 for unknown file extensions 
+		sendResponse(res, 404, `404: Unsupported file type ${extension}`);
+		return;
 	}
 
 	let filePath: string = path.join(ROOT_PATH, url);
