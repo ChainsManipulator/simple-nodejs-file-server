@@ -7,29 +7,39 @@ const ROOT_PATH: string = path.join(process.cwd(), "./wwwroot");
 const HOSTNAME: string = "127.0.0.1";
 const PORT: number = 3000;
 
-const sendResponse = (res: http.ServerResponse, responseCode: number, data: string, extension: string = "html") => {
+// flag indicating if url without extension shoud be
+// interpreted as a name of html file or as a folder
+const ADD_HTML_EXTENSION: boolean = true;
+
+const sendResponse = (res: http.ServerResponse, responseCode: number, data: string, extension: string = "html"): void => {
 	const mimeType: string = MIME_TYPES.get(extension);
 	res.writeHead(responseCode, { "Content-Type": mimeType });
 	res.end(data);
 }
 
 const server = http.createServer(async (req, res) => {
-	const url: string = req.url ?? "/";
-	const paths: string[] = [ROOT_PATH, url];
+	// if request url is emty replacing it with default value
+	let url: string = req.url && req.url !== "/" ? req.url : "/index.html";
+	const fileName: string = path.basename(url);
 
-	// if no filename provided using index.html by default
-	if (url.endsWith("/") && !url.includes(".")) paths.push("index.html");
-	
 	// getting file extension without leading dot
-	let extension: string = path.extname(paths[paths.length-1]).substring(1).toLowerCase();
+	let extension: string = path.extname(fileName).substring(1).toLowerCase();
 
-	// if there is no file extension then adding "html"
+	// if there is no file extension
 	if (!extension) {
-		paths[paths.length-1] += ".html";
+		if (ADD_HTML_EXTENSION) {
+			// removing trailing "/" if present
+			if (url.endsWith("/")) url = url.slice(0, -1);
+			url += ".html";
+		} else {
+			if (!url.endsWith("/")) url += "/";
+			url += "index.html";
+		}
+
 		extension = "html";
 	}
 
-	let filePath: string = path.join(...paths);
+	let filePath: string = path.join(ROOT_PATH, url);
 
 	const pathUnderRoot: boolean = filePath.startsWith(ROOT_PATH);
 	if (!pathUnderRoot) {
