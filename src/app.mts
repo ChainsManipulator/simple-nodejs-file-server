@@ -11,9 +11,13 @@ const PORT: number = 3000;
 // interpreted as a name of html file or as a folder
 const ADD_HTML_EXTENSION: boolean = true;
 
-// flag indicating if for html page 404 page returned when 
-// file not found or just a text message
+// flag indicating if for html page 404 page returned 
+// when file not found or just a text message
 const RETURN_404_PAGE: boolean = true;
+
+// flag indicating if server should only 
+// return files with known mime types
+const REFUSE_UNKNOWN_EXTENSIONS: boolean = false;
 
 const sendResponse = (res: http.ServerResponse, responseCode: number, data: string, extension: string = "html"): void => {
 	const mimeType: string = MIME_TYPES.get(extension);
@@ -53,6 +57,16 @@ const server = http.createServer(async (req, res) => {
 		extension = "html";
 	}
 
+	let mimeType: string;
+	if (MIME_TYPES.has(extension)) mimeType = MIME_TYPES.get(extension);
+	else {
+		if (REFUSE_UNKNOWN_EXTENSIONS) {
+			// return 404 for unknown file extensions 
+			sendResponse(res, 404, `404: Unsupported file type ${extension}`);
+			return;
+		} else mimeType = MIME_TYPES.get("default");
+	}
+
 	let filePath: string = path.join(ROOT_PATH, url);
 
 	const pathUnderRoot: boolean = filePath.startsWith(ROOT_PATH);
@@ -63,17 +77,6 @@ const server = http.createServer(async (req, res) => {
 			return;
 		}
 	}
-
-	const mimeType: string = MIME_TYPES.has(extension) ?
-		MIME_TYPES.get(extension) :
-		MIME_TYPES.get("default");
-	/* 
-	// alternatevly return 404 for unknown file extensions 
-	const supportedExtension: boolean = Boolean(mimeType);
-	if (!MIME_TYPES.has(extension)) {
-		sendResponse(res, 404, `404: Unsupported file type ${extension}`);
-		return;
-	}*/
 
 	try {
 		await sendResponseFile(res, filePath, mimeType);
