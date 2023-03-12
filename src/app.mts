@@ -1,7 +1,7 @@
 import * as http from "http";
 import { promises as fs, createReadStream, ReadStream } from "fs";
 import * as path from "path";
-import { MIME_TYPES } from "./mimeTypes.mjs";
+import MIME_TYPES from "./mimeTypes.mjs";
 
 const ROOT_PATH: string = path.join(process.cwd(), "./wwwroot");
 const HOSTNAME: string = "127.0.0.1";
@@ -19,9 +19,8 @@ const RETURN_404_PAGE: boolean = true;
 // return files with known mime types
 const REFUSE_UNKNOWN_EXTENSIONS: boolean = false;
 
-const sendResponse = (res: http.ServerResponse, responseCode: number, data: string, extension: string = "html"): void => {
-	const mimeType: string = MIME_TYPES.get(extension);
-	res.writeHead(responseCode, { "Content-Type": mimeType });
+const sendTextResponse = (res: http.ServerResponse, responseCode: number, data: string): void => {
+	res.writeHead(responseCode, { "Content-Type": MIME_TYPES.get("txt") });
 	res.end(data);
 }
 
@@ -66,7 +65,7 @@ const server = http.createServer(async (req, res) => {
 
 	if (!isExtensionKnown && REFUSE_UNKNOWN_EXTENSIONS) {
 		// return 404 for unknown file extensions 
-		sendResponse(res, 404, `404: Unsupported file type ${extension}`);
+		sendTextResponse(res, 404, `404: Unsupported file type ${extension}`);
 		return;
 	}
 
@@ -74,9 +73,10 @@ const server = http.createServer(async (req, res) => {
 
 	const pathUnderRoot: boolean = filePath.startsWith(ROOT_PATH);
 	if (!pathUnderRoot) {
-		if (RETURN_404_PAGE && extension === "html") filePath = path.join(ROOT_PATH, "/404.html");
-		else {
-			sendResponse(res, 404, `404: Invalid path "${filePath}"`);
+		if (RETURN_404_PAGE && extension === "html") {
+			filePath = path.join(ROOT_PATH, "/404.html");
+		} else {
+			sendTextResponse(res, 404, `404: Invalid path "${filePath}"`);
 			return;
 		}
 	}
@@ -87,10 +87,17 @@ const server = http.createServer(async (req, res) => {
 		console.log(`Served file ${filePath} with ${mimeType} mime-type `);
 	} catch {
 		if (RETURN_404_PAGE && extension === "html") {
-			filePath = path.join(ROOT_PATH, "/404.html");
-			await sendResponseFile(res, filePath, mimeType);
+			try {
+				filePath = path.join(ROOT_PATH, "/404.html");
+				await sendResponseFile(res, filePath, mimeType);
+			} catch {
+				// if there is no 404.html file sending plain text message
+				sendTextResponse(res, 404, `404: File "${filePath}" not found`);
+			}
 		}
-		else sendResponse(res, 404, `404: File "${filePath}" not found`);
+		else {
+			sendTextResponse(res, 404, `404: File "${filePath}" not found`);
+		}
 	}
 });
 
