@@ -1,4 +1,4 @@
-const MIME_TYPES = new Map();
+const MIME_TYPES: Map<string, string> = new Map();
 
 MIME_TYPES.set("epub", "application/epub+zip");
 MIME_TYPES.set("gz", "application/gzip");

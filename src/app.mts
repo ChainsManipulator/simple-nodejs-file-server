@@ -2,29 +2,16 @@ import * as http from "http";
 import { promises as fs, createReadStream, ReadStream } from "fs";
 import * as path from "path";
 import MIME_TYPES from "./mimeTypes.mjs";
+import * as settings from "./serverSettings.mjs";
 
-const ROOT_PATH: string = path.join(process.cwd(), "./wwwroot");
-const HOSTNAME: string = "127.0.0.1";
-const PORT: number = 3000;
-
-// flag indicating if url without extension shoud be
-// interpreted as a name of html file or as a folder
-const ADD_HTML_EXTENSION: boolean = true;
-
-// flag indicating if for html page 404 page returned 
-// when file not found or just a text message
-const RETURN_404_PAGE: boolean = true;
-
-// flag indicating if server should only 
-// return files with known mime types
-const REFUSE_UNKNOWN_EXTENSIONS: boolean = false;
+const ROOT_PATH: string = path.join(process.cwd(), settings.RELATIVE_PATH);
 
 const sendTextResponse = (res: http.ServerResponse, responseCode: number, data: string): void => {
 	res.writeHead(responseCode, { "Content-Type": MIME_TYPES.get("txt") });
 	res.end(data);
 }
 
-const sendResponseFile = async (res: http.ServerResponse, filePath: string, mimeType: string) => {
+const sendResponseFile = async (res: http.ServerResponse, filePath: string, mimeType: string): Promise<void> => {
 	// checking if file exists and readable
 	await fs.access(filePath, fs.constants.R_OK);
 
@@ -46,7 +33,8 @@ const server = http.createServer(async (req, res) => {
 
 	// if there is no file extension
 	if (!extension) {
-		if (ADD_HTML_EXTENSION) {
+		extension = "html";
+		if (settings.ADD_HTML_EXTENSION) {
 			// removing trailing "/" if present
 			if (url.endsWith("/")) url = url.slice(0, -1);
 			url += ".html";
@@ -54,16 +42,12 @@ const server = http.createServer(async (req, res) => {
 			if (!url.endsWith("/")) url += "/";
 			url += "index.html";
 		}
-
-		extension = "html";
 	}
 
 	const isExtensionKnown: boolean = MIME_TYPES.has(extension);
-	const mimeType: string = isExtensionKnown ?
-		MIME_TYPES.get(extension) :
-		MIME_TYPES.get("default");
+	const mimeType: string = MIME_TYPES.get(extension) ?? MIME_TYPES.get("default")!;
 
-	if (!isExtensionKnown && REFUSE_UNKNOWN_EXTENSIONS) {
+	if (!isExtensionKnown && settings.REFUSE_UNKNOWN_EXTENSIONS) {
 		// return 404 for unknown file extensions 
 		sendTextResponse(res, 404, `404: Unsupported file type ${extension}`);
 		return;
@@ -73,7 +57,7 @@ const server = http.createServer(async (req, res) => {
 
 	const pathUnderRoot: boolean = filePath.startsWith(ROOT_PATH);
 	if (!pathUnderRoot) {
-		if (RETURN_404_PAGE && extension === "html") {
+		if (settings.RETURN_404_PAGE && extension === "html") {
 			filePath = path.join(ROOT_PATH, "/404.html");
 		} else {
 			sendTextResponse(res, 404, `404: Invalid path "${filePath}"`);
@@ -86,7 +70,7 @@ const server = http.createServer(async (req, res) => {
 
 		console.log(`Served file ${filePath} with ${mimeType} mime-type `);
 	} catch {
-		if (RETURN_404_PAGE && extension === "html") {
+		if (settings.RETURN_404_PAGE && extension === "html") {
 			try {
 				filePath = path.join(ROOT_PATH, "/404.html");
 				await sendResponseFile(res, filePath, mimeType);
@@ -101,6 +85,6 @@ const server = http.createServer(async (req, res) => {
 	}
 });
 
-server.listen(PORT, HOSTNAME, () => {
-	console.log(`Server running at http://${HOSTNAME}:${PORT}/`);
+server.listen(settings.PORT, settings.HOSTNAME, () => {
+	console.log(`Server running at http://${settings.HOSTNAME}:${settings.PORT}/`);
 });
