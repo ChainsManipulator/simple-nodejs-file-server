@@ -105,4 +105,5 @@ dist
 .tern-port
 
 # Compiled js files
-.dist/
+dist/
+wwwroot/js/

@@ -1,27 +1,24 @@
 {
     "compilerOptions": {
 		"target": "es2022",
-		"module": "node16",
 		"strict": true,
 		"forceConsistentCasingInFileNames": true,
-        "esModuleInterop": true,
         "allowSyntheticDefaultImports": true,
         "noImplicitAny": true,
 		"preserveConstEnums": true,
         "sourceMap": true,
-		"rootDir": "src",
-        "outDir": "dist",
+		"rootDir": "ts",
+        "outDir": "js",
         "baseUrl": ".",
         "paths": {
             "*": [
-                "node_modules/*",
-                "src/types/*"
+                "libraries/*",
+                "ts/types/*"
             ]
         }
     },
     "include": [
-        "src"
+        "ts"
     ],
-	"exclude": ["node_modules", "**/*.spec.ts"],
-    "esm": true,
+	"exclude": ["libraries", "**/*.spec.ts"]
 }
