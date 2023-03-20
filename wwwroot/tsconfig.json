@@ -1,11 +1,14 @@
 {
+    "compileOnSave": true,
     "compilerOptions": {
 		"target": "es2022",
 		"strict": true,
+        "noImplicitOverride": true,
+        "noImplicitReturns": true,
+        "noUncheckedIndexedAccess": true,
 		"forceConsistentCasingInFileNames": true,
         "allowSyntheticDefaultImports": true,
-        "noImplicitAny": true,
-		"preserveConstEnums": true,
+        "removeComments":true,
         "sourceMap": true,
 		"rootDir": "ts",
         "outDir": "js",

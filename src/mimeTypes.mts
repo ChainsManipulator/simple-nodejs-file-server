@@ -71,7 +71,7 @@ MIME_TYPES.set("htm", "text/html");
 MIME_TYPES.set("html", "text/html");
 MIME_TYPES.set("txt", "text/plain");
 
-MIME_TYPES.set("ts", "video/mp2t");
+MIME_TYPES.set("ts", "video/mp2t"); // also used for typescript, so it might be a good idea to change it
 MIME_TYPES.set("mp4", "video/mp4");
 MIME_TYPES.set("mpeg", "video/mpeg");
 MIME_TYPES.set("ogv", "video/ogg");

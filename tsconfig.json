@@ -1,13 +1,15 @@
 {
+    "compileOnSave": true,
     "compilerOptions": {
 		"target": "es2022",
 		"module": "node16",
 		"strict": true,
+        "noImplicitOverride": true,
+        "noImplicitReturns": true,
+        "noUncheckedIndexedAccess": true,
 		"forceConsistentCasingInFileNames": true,
         "esModuleInterop": true,
         "allowSyntheticDefaultImports": true,
-        "noImplicitAny": true,
-		"preserveConstEnums": true,
         "sourceMap": true,
 		"rootDir": "src",
         "outDir": "dist",
