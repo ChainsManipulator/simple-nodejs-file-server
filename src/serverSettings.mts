@@ -1,4 +1,4 @@
-const settingsMap: Map<string, boolean | string | number> = new Map();
+const settingsMap: Map<string, boolean | string | number> = new Map<string, boolean | string | number>();
 
 // trying to read settings from environment variables 
 // if none present then setting default values 
@@ -8,6 +8,7 @@ settingsMap.set("RELATIVE_PATH", process.env.RELATIVE_PATH ?? "./wwwroot");
 settingsMap.set("ADD_HTML_EXTENSION", process.env.ADD_HTML_EXTENSION ?? true);
 settingsMap.set("RETURN_404_PAGE", process.env.RETURN_404_PAGE ?? true);
 settingsMap.set("REFUSE_UNKNOWN_EXTENSIONS", process.env.REFUSE_UNKNOWN_EXTENSIONS ?? false);
+settingsMap.set("DEFAULT_MIME_TYPE", process.env.DEFAULT_MIME_TYPE ?? "application/octet-stream");
 
 export const HOSTNAME: string = settingsMap.get("HOSTNAME") as string;
 export const PORT: number = Number(settingsMap.get("PORT"));
@@ -26,3 +27,6 @@ export const RETURN_404_PAGE: boolean = Boolean(settingsMap.get("RETURN_404_PAGE
 // flag indicating if server should only 
 // return files with known mime types
 export const REFUSE_UNKNOWN_EXTENSIONS: boolean = Boolean(settingsMap.get("REFUSE_UNKNOWN_EXTENSIONS"));
+
+// default mime-type for files with unknown extensions or without any extension
+export const DEFAULT_MIME_TYPE: string = String(settingsMap.get("DEFAULT_MIME_TYPE"));

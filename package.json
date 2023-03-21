@@ -1,12 +1,16 @@
 {
 	"devDependencies": {
 		"@types/node": "^18.14.2",
+		"@typescript-eslint/eslint-plugin": "^5.56.0",
+		"@typescript-eslint/parser": "^5.56.0",
+		"eslint": "^8.36.0",
 		"nodemon": "^2.0.21",
-		"tslint": "^6.1.3",
-		"typescript": "^5.0.2"
+		"typescript": "^5.0.2",
+		"typescript-eslint": "^0.0.1-alpha.0"
 	},
 	"scripts": {
-		"start": "(tsc -p ./wwwroot) && (tsc) && (nodemon ./dist/app.mjs)"
+		"start": "(tsc -p ./wwwroot) && (tsc) && (nodemon ./dist/app.mjs)",
+		"lint": "eslint . --ext .ts"
 	},
 	"type": "module"
 }

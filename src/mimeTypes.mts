@@ -1,4 +1,6 @@
-const MIME_TYPES: Map<string, string> = new Map();
+import { DEFAULT_MIME_TYPE } from "./serverSettings.mjs";
+
+const MIME_TYPES: Map<string, string> = new Map<string, string>();
 
 MIME_TYPES.set("epub", "application/epub+zip");
 MIME_TYPES.set("gz", "application/gzip");
@@ -78,6 +80,6 @@ MIME_TYPES.set("ogv", "video/ogg");
 MIME_TYPES.set("webm", "video/webm");
 MIME_TYPES.set("avi", "video/x-msvideo");
 
-MIME_TYPES.set("default", "application/octet-stream");
+MIME_TYPES.set("default", DEFAULT_MIME_TYPE);
 
 export default MIME_TYPES;

@@ -23,8 +23,7 @@ const sendResponseFile = async (res: http.ServerResponse, filePath: string, mime
 
 const server = http.createServer(async (req, res) => {
 	// if request url is emty replacing it with default value
-	let url: string = req.url!;
-	if (!req.url || req.url === "/") url = "/index.html";
+	let url: string = req.url && req.url !== "/" ? req.url : "/index.html";
 
 	const fileName: string = path.basename(url);
 
@@ -45,7 +44,7 @@ const server = http.createServer(async (req, res) => {
 	}
 
 	const isExtensionKnown: boolean = MIME_TYPES.has(extension);
-	const mimeType: string = MIME_TYPES.get(extension) ?? MIME_TYPES.get("default")!;
+	const mimeType: string = MIME_TYPES.get(extension) ?? settings.DEFAULT_MIME_TYPE;
 
 	if (!isExtensionKnown && settings.REFUSE_UNKNOWN_EXTENSIONS) {
 		// return 404 for unknown file extensions 
